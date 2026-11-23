@@ -177,7 +177,7 @@ def prepare(_raw: pd.DataFrame, source_id: str, metric: str) -> pd.DataFrame:
             "expo": d[metric],
             "nivel": nivel,
         }
-    ).dropna(subset=["nivel"])
+    ).dropna(subset=["nivel"]).query("peso > 0")
     out["peso_desemp"] = out["peso"] * out["desempleado"]
     return out.reset_index(drop=True)
 
