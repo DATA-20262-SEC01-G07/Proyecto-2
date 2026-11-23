@@ -1,2 +1,3 @@
 ﻿data/raw/cps_00001.csv
+data/processed/*.pkl
 *.xlsx
