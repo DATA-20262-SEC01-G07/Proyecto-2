@@ -4,11 +4,13 @@ Proyecto 2 de Aplicaciones en Ciencia de Datos (DATA-1002), grupos 6 y 7,  Unive
 
 En este proyecto miramos qué ha pasado con el desempleo en Estados Unidos desde 2021 y si tiene relación con qué tan expuesta está cada ocupación a la inteligencia artificial. También revisamos si el nivel educativo y el tiempo que las personas llevan buscando trabajo cambian esa relación.
 
-Trabajamos con datos de Estados Unidos porque la información es mucho más completa. En Colombia todavía hay muy pocos datos sobre el uso de la IA y su efecto en el empleo. Por eso usamos el caso de Estados Unidos como una alerta temprana para pensar qué podría pasar aquí y cómo prepararnos desde la educación.
+Trabajamos con datos de Estados Unidos porque allí la información sobre empleo es muy completa y detallada, lo que permite analizar con rigor cómo se relaciona la exposición a la IA con el desempleo.
 
 ## Pregunta analítica
 
-¿Cómo se relacionan el nivel educativo y el tiempo que tardan en reemplearse los trabajadores desempleados con la exposición a la inteligencia artificial en Estados Unidos desde 2021, y qué ocupaciones altamente expuestas han visto subir su desempleo frente a las que lo mantuvieron estable entre 2021 y 2026, junto con las características que distinguen a cada grupo?
+**En una frase:** ¿las ocupaciones más expuestas a la IA generativa tienen más desempleo en Estados Unidos, y a quiénes les cuesta más volver a trabajar?
+
+**En detalle:** ¿Cómo se relacionan el nivel educativo y el tiempo que tardan en reemplearse los trabajadores desempleados con la exposición a la inteligencia artificial en Estados Unidos desde 2021, y qué ocupaciones altamente expuestas han visto subir su desempleo frente a las que lo mantuvieron estable entre 2021 y 2026, junto con las características que distinguen a cada grupo?
 
 La dividimos en dos partes:
 
@@ -17,13 +19,29 @@ La dividimos en dos partes:
 
 El "tiempo para reemplearse" lo medimos como las semanas que la persona desempleada lleva buscando trabajo al momento de la encuesta.
 
+## Decisión que respalda y actores
+
+**Actores afectados**
+
+- Personas desempleadas cuyo último oficio está muy expuesto a la IA, en especial quienes tienen formación técnica, de pregrado o de posgrado, y las personas de 55 a 64 años.
+
+**Quién puede usar estos resultados**
+
+- Agencias de empleo, programas de recapacitación e instituciones de formación.
+
+**Decisiones que ayuda a tomar**
+
+1. A quiénes dirigir primero programas de recapacitación y de reempleo.
+2. Qué ocupaciones monitorear de forma periódica para actuar antes de que el desempleo se prolongue.
+3. Si basta con enfocarse en las ocupaciones más expuestas o si hace falta una política más amplia.
+
 ## Hipótesis
 
 El aumento reciente del desempleo en Estados Unidos está relacionado con el auge de la inteligencia artificial: entre más expuesta a la IA esté una ocupación, más ha crecido su desempleo. Además, esta relación es más fuerte en los trabajadores con menor nivel educativo.
 
 ## Objetivos
 
-**General:** analizar cómo se relacionan la exposición a la IA, el nivel educativo y el tiempo que los desempleados tardan en volver a trabajar en Estados Unidos (2021–2026), para identificar qué ocupaciones muestran señales de reemplazo u optimización y sacar lecciones que ayuden a Colombia a preparar a su población desde la educación.
+**General:** analizar cómo se relacionan la exposición a la IA, el nivel educativo y el tiempo que los desempleados tardan en volver a trabajar en Estados Unidos (2021–2026), para identificar qué ocupaciones muestran señales de reemplazo u optimización y formular recomendaciones para quienes toman decisiones de empleo y formación.
 
 **Específicos:**
 
@@ -32,7 +50,7 @@ El aumento reciente del desempleo en Estados Unidos está relacionado con el aug
 3. Comparar las semanas que llevan buscando empleo los desempleados según la exposición a la IA de su último oficio y su nivel educativo.
 4. Identificar qué ocupaciones muy expuestas aumentaron su tasa de desempleo, cuáles la mantuvieron estable y cuáles la redujeron, comparando 2022–2023 con 2025–2026.
 5. Describir qué distingue a cada grupo: salario mediano, nivel educativo, edad, sexo y grupo ocupacional.
-6. Proponer recomendaciones educativas para Colombia y una forma de repetir el estudio con datos colombianos.
+6. Proponer recomendaciones concretas de recapacitación, reempleo y monitoreo, sustentadas en los resultados.
 
 ## Contexto
 
@@ -40,13 +58,11 @@ Desde que salió ChatGPT en noviembre de 2022, la IA generativa empezó a usarse
 
 En 2023, investigadores de OpenAI y de la Universidad de Pensilvania calcularon qué tan expuesta está cada ocupación a estos modelos. Que una tarea esté expuesta no quiere decir que la persona vaya a perder su trabajo: la IA puede reemplazarla, pero también puede ayudarle a ser más productiva. Eso es justamente lo que queremos revisar con datos reales de desempleo.
 
-Para Colombia el tema importa mucho. El país ya tiene problemas de desempleo e informalidad, y no todo el mundo ha tenido acceso a formación en tecnología. Si la IA empieza a afectar el empleo, los primeros perjudicados serían quienes tienen menos oportunidades de aprender a usarla.
+Entender qué trabajadores y qué ocupaciones están más expuestos importa porque permite anticipar quién necesitará apoyo para adaptarse, en lugar de reaccionar cuando el desempleo ya se prolongó.
 
 ## ¿Para qué sirve?
 
-Aunque los datos son de Estados Unidos, la idea es aprovechar esa experiencia para Colombia. Lo que encontremos allá nos dice qué tipo de trabajadores y qué niveles educativos podrían verse más afectados si pasa lo mismo aquí.
-
-Con esa información, entidades como el Ministerio de Educación o el SENA podrían adelantarse y empezar a enseñar a usar la IA como herramienta, antes de que el problema llegue.
+Los resultados ayudan a quienes toman decisiones de empleo y formación (agencias de empleo, programas de recapacitación e instituciones educativas) a decidir a quiénes dirigir primero el apoyo y qué ocupaciones vigilar. La idea es adelantarse y enseñar a usar la IA como herramienta antes de que el desempleo se prolongue.
 
 ## Datos
 
@@ -54,7 +70,7 @@ Con esa información, entidades como el Ministerio de Educación o el SENA podr�
 |---|---|---|---|
 | [CPS – Current Population Survey](https://cps.ipums.org/cps/) (U.S. Census Bureau y BLS, descargada desde IPUMS-CPS) | Situación laboral, semanas desempleado, nivel educativo, edad, sexo, ocupación y peso de muestreo | Una persona encuestada en un mes | Enero 2021 – octubre 2026 |
 | [Lista de ocupaciones del Censo 2018](https://www.census.gov/topics/employment/industry-occupation/guidance/code-lists.html) | Equivalencia entre el código de ocupación del CPS y el código SOC | Una ocupación del Censo | 2018 |
-| [BLS OEWS](https://www.bls.gov/oes/tables.htm) (Occupational Employment and Wage Statistics) | Empleo total y salario mediano anual de cada ocupación | Una ocupación (código SOC) | [año] |
+| [BLS OEWS](https://www.bls.gov/oes/tables.htm) (Occupational Employment and Wage Statistics) | Empleo total y salario mediano anual de cada ocupación | Una ocupación (código SOC) | 2025 |
 | [Índice de exposición a la IA](https://github.com/openai/GPTs-are-GPTs) (Eloundou et al., 2023) | Exposición de las tareas de cada ocupación a la IA | Una ocupación (código O*NET-SOC) | 2023 |
 
 ### Cómo conseguir el archivo del CPS
@@ -119,7 +135,7 @@ El 22,3 % de los desempleados lleva 27 semanas o más buscando trabajo. Este por
 
 Al cruzar educación y exposición, el desempleo de larga duración es mayor en la exposición alta que en la baja en todos los niveles educativos, pero la diferencia varía. Es pequeña en secundaria (22,5 % frente a 21,7 %) y en pregrado (27,2 % frente a 25,3 %), y grande en técnico o asociado (27,6 % frente a 20,6 %) y en posgrado (28,7 % frente a 21,3 %). En la exposición alta el porcentaje va de 22,0 % con menos de secundaria a 28,7 % con posgrado, mientras que en la baja no sigue una tendencia clara (el valor más alto es 25,3 % en pregrado) y en la media va de 17,3 % a 23,3 %.
 
-Hay un apoyo débil a que el desempleo haya crecido más donde la exposición es mayor. La hipótesis de que la relación es más fuerte con menor educación no se evaluó con el cambio en el desempleo, y en la duración ocurre lo contrario: la diferencia entre exposición alta y baja es mayor en los niveles educativos más altos. Los resultados son asociaciones y no permiten atribuir el desempleo a la IA.
+El apoyo es débil y no concluyente: la diferencia entre el 42 % de ocupaciones que subieron en exposición alta y el 32,5 % del resto no es estadísticamente significativa (p = 0,155). La hipótesis de que la relación es más fuerte con menor educación no se evaluó con el cambio en el desempleo, y en la duración ocurre lo contrario: la diferencia entre exposición alta y baja es mayor en los niveles educativos más altos. Los resultados son asociaciones y no permiten atribuir el desempleo a la IA.
 
 Los resultados responden la pregunta analítica de la siguiente manera. El desempleo de larga duración (27 semanas o más) aumenta con el nivel educativo (de 18,5 % con menos de secundaria a 25,4 % con posgrado) y es mayor en la exposición alta (25,8 %) que en la baja y media (21,0 % y 21,4 %). La diferencia entre exposición alta y baja es mayor en técnico o asociado (27,6 % frente a 20,6 %) y en posgrado (28,7 % frente a 21,3 %). Esta duración es el tiempo que llevan buscando empleo al momento de la encuesta y no el tiempo hasta reemplearse. En cuanto a las ocupaciones, el desempleo subió más de un punto en el 42 % de las de exposición alta. Las que subieron tienen mayor exposición mediana (0,55 frente a 0,50), menos empleo total, más presencia del grupo Management, Business, Science, and Arts (69,0 % frente a 58,8 %), más trabajadores con pregrado o más (72,0 % frente a 56,7 %) y menos mujeres (41,8 % frente a 52,9 %). Estas son asociaciones y no prueban que la IA cause el desempleo.
 
@@ -128,7 +144,7 @@ Los resultados responden la pregunta analítica de la siguiente manera. El desem
 - **Estar expuesto no es lo mismo que ser reemplazado.** El índice mide lo que la IA podría hacer en cada ocupación, no si las empresas la están usando.
 - **No podemos decir que la IA cause el desempleo.** En los mismos años subieron las tasas de interés, hubo despidos grandes en empresas de tecnología y la economía se estaba recuperando de la pandemia.
 - **El cruce de ocupaciones no es perfecto.** Al traducir los códigos se juntan oficios distintos, y algunas ocupaciones (las "all other" y las militares) quedan sin dato de exposición.
-- **Los resultados son de Estados Unidos** y no se pueden pasar tal cual a Colombia.
+- - **Los resultados son de Estados Unidos** y no se pueden extender tal cual a otros países o contextos.
 - **El período "antes" (2022–2023) ya incluye meses en los que existía ChatGPT**, así que no es un antes y después exacto.
 - **En ocupaciones pequeñas la tasa es inestable.** Por eso pusimos mínimos de desempleados, pero esos cortes los decidimos nosotros.
 - **2026 solo tiene datos hasta octubre**, mientras que los otros años tienen los doce meses.
@@ -137,7 +153,7 @@ Los resultados responden la pregunta analítica de la siguiente manera. El desem
 
 A partir de esto, se proponen las siguientes acciones. La primera es un programa de reubicación y recapacitación para trabajadores con formación técnica, de pregrado o de posgrado en ocupaciones de exposición alta, que son quienes tienen mayor desempleo de larga duración, con formación en habilidades complementarias a la IA y orientación hacia ocupaciones de menor exposición. La segunda es una campaña de reempleo para personas de 55 a 64 años, entre quienes el 27,5 % de los desempleados lleva 27 semanas o más buscando trabajo, frente al 14,7 % entre los 16 y 24 años. La tercera es monitorear periódicamente las ocupaciones de exposición alta del grupo Management, Business, Science, and Arts con poco empleo total, que son las que más suben, para actuar antes de que el desempleo se prolongue. La cuarta es no limitar las políticas a la exposición alta, porque las ocupaciones de exposición baja tienen la mayor tasa de desempleo (5,65 % en 2026 frente a 2,95 % en las altas).
 
-Para fortalecer estas conclusiones, falta estimar modelos que controlen por edad, sexo y grupo ocupacional, y seguir a las mismas personas entre meses de la CPS para medir el tiempo hasta reemplearse. Una vez completado este análisis para Estados Unidos, el equipo quiere hacer un estudio similar para Colombia con la GEIH del DANE, usando una equivalencia entre la CIUO-08 A.C. y la clasificación SOC de Estados Unidos para adaptar el índice de exposición.
+Para fortalecer estas conclusiones, falta estimar modelos que controlen por edad, sexo y grupo ocupacional, y seguir a las mismas personas entre meses de la CPS para medir el tiempo hasta reemplearse.
 
 ## Equipo
 
@@ -148,7 +164,10 @@ Para fortalecer estas conclusiones, falta estimar modelos que controlen por edad
 
 ## Referencias
 
-- Eloundou, T., Manning, S., Mishkin, P. y Rock, D. (2023). *GPTs are GPTs: An Early Look at the Labor Market Impact Potential of Large Language Models.*
-- IPUMS CPS. [Copiar aquí la cita exacta que IPUMS muestra al descargar el extracto.]
-- U.S. Census Bureau. *2018 Census Occupation Code List.*
-- U.S. Bureau of Labor Statistics. *Occupational Employment and Wage Statistics (OEWS).*
+- Eloundou, T., Manning, S., Mishkin, P. y Rock, D. (2023). GPTs are GPTs: An Early Look at the Labor Market Impact Potential of Large Language Models.
+
+- Flood, S., King, M., Rodgers, R., Ruggles, S., Warren, J. R., Backman, D., Chen, A., Cooper, G., Richards, S., Schouweiler, M. y Westberry, M. (2026). IPUMS CPS: Version 12.0 [dataset]. Minneapolis, MN: IPUMS. https://doi.org/10.18128/D030.V12.0
+
+- U.S. Census Bureau. 2018 Census Occupation Code List.
+
+- U.S. Bureau of Labor Statistics. Occupational Employment and Wage Statistics (OEWS).

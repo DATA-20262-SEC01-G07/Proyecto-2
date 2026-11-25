@@ -10,6 +10,7 @@ Eloundou et al. por SOC), con los nombres de columnas originales.
 from __future__ import annotations
 
 import io
+import math
 from pathlib import Path
 
 import numpy as np
@@ -148,7 +149,7 @@ def edu_group(e: pd.Series) -> pd.Series:
 
 @st.cache_data(show_spinner="Preparando variables…")
 def prepare(_raw: pd.DataFrame, source_id: str, metric: str) -> pd.DataFrame:
-    d = _raw[(_raw["OCC"].fillna(0) != 0) & (_raw["EMPSTAT"] < 30)].copy()
+    d = _raw[(_raw["OCC"].fillna(0) != 0) & _raw["EMPSTAT"].between(10, 22)].copy()
     d = d.dropna(subset=["SOC_Code", "Census_Title", metric])
 
     # Terciles de exposición calculados sobre ocupaciones únicas (SOC), como en el notebook
@@ -291,6 +292,14 @@ def getv(df: pd.DataFrame, i, c) -> float:
     except Exception:
         return np.nan
 
+def chi2_p(a: int, b: int, c: int, d: int) -> float:
+    """p-valor de la prueba chi-cuadrado 2x2 (con corrección de Yates), sin librerías extra."""
+    n = a + b + c + d
+    den = (a + b) * (c + d) * (a + c) * (b + d)
+    if den == 0:
+        return np.nan
+    chi = n * max(0, abs(a * d - b * c) - n / 2) ** 2 / den
+    return math.erfc(math.sqrt(chi / 2))
 
 def style(fig: go.Figure, h: int = 420) -> go.Figure:
     fig.update_layout(
@@ -385,6 +394,7 @@ if sexo_sel != "Todos":
     f = f[f["sexo"] == sexo_sel]
 f = f[f["edad"].between(*edad_rng) & f["grupo"].isin(grupos_sel)]
 fy = f[f["anio"].between(y0, y1)]
+fy22 = fy[fy["anio"] >= 2022]
 if fy.empty:
     st.warning("Los filtros dejaron la muestra vacía. Ajusta la barra lateral.")
     st.stop()
@@ -401,7 +411,7 @@ idx = 100 * (piv_all / piv_all.loc[base] - 1)          # % de cambio vs. año ba
 last = int(piv.index.max())
 
 cambio = trayectorias(f, antes, despues, min_n, umbral)
-dur_nivel = dur_stats(fy, ["nivel"]).set_index("nivel")
+dur_nivel = dur_stats(fy22, ["nivel"]).set_index("nivel")
 
 lf_last = fy[fy["anio"] == last].groupby("nivel")["peso"].sum()
 share_alta = 100 * lf_last.get("Alta", np.nan) / lf_last.sum()
@@ -426,16 +436,18 @@ else:
 st.markdown(
     f"""<div class="hero">
     <div class="tag">CPS · BLS OEWS · Eloundou et al. ("GPTs are GPTs") · {years[0]}–{years[-1]}</div>
-    <h1>IA generativa y mercado laboral en EE. UU.</h1>
-    <p>¿Cómo se relacionan la educación y el tiempo que tardan en reemplearse los desempleados con la exposición
-    de su ocupación a la IA? ¿Qué ocupaciones muy expuestas vieron subir su desempleo y cuáles lo mantuvieron estable?</p>
+    <h1>IA y desempleo en Estados Unidos: ¿reemplazo u optimización?</h1>
+    <p>¿Cómo se relacionan el nivel educativo y el tiempo que tardan en reemplearse los trabajadores desempleados 
+    con la exposición a la inteligencia artificial en Estados Unidos desde 2021, y qué ocupaciones altamente expuestas 
+    han visto subir su desempleo frente a las que lo mantuvieron estable entre 2021 y 2026, junto con las características 
+    que distinguen a cada grupo?</p>
     </div>""",
     unsafe_allow_html=True,
 )
 
 tabs = st.tabs([
     "Resumen", "Evolución del desempleo", "Educación y reempleo",
-    "Ocupaciones", "¿Subió o se mantuvo?", "Método y datos",
+    "Ocupaciones", "¿Subió o se mantuvo?", "Conclusiones","Método y datos",
 ])
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -603,7 +615,7 @@ with tabs[2]:
         horizontal=True, key="edu_meas",
     )
     col_m = {"Mediana de semanas": "mediana", "Media de semanas": "media"}.get(medida, "largo_plazo")
-    ds = dur_stats(fy, ["educ", "nivel"])
+    ds = dur_stats(fy22, ["educ", "nivel"])
     ds = ds[ds["n"] >= MIN_CELL]
     c3, c4 = st.columns(2)
     with c3:
@@ -621,7 +633,7 @@ with tabs[2]:
                                  else ("educ", EDU_ORDER, EDU_COLORS))
         weeks = np.arange(0, 105)
         fig = go.Figure()
-        dd = fy[fy["semanas"].notna()]
+        dd = fy22[fy22["semanas"].notna()]
         for g_name in sorder:
             sub = dd[dd[scol] == g_name]
             if len(sub) >= MIN_CELL:
@@ -634,6 +646,39 @@ with tabs[2]:
         show(style(fig, 420), "edu_surv_fig")
         tip("Cada curva dice qué porcentaje de desempleados sigue sin empleo tras X semanas. "
             "Una curva más alta = reempleo más lento.")
+    st.subheader("¿Quién lleva más tiempo buscando empleo?")
+    ver = st.radio("Ver por", ["Edad", "Sexo", "Exposición a la IA", "Educación", "Grupo ocupacional"],
+                   horizontal=True, key="edu_quien")
+    ddur = fy22[fy22["semanas"].notna()].copy()
+    if ddur.empty:
+        st.info("No hay datos de duración para los años seleccionados (se usan desde 2022).")
+    else:
+        edades = ["16-24", "25-34", "35-44", "45-54", "55-64", "65+"]
+        ddur["grupo_edad"] = pd.cut(ddur["edad"], bins=[15, 24, 34, 44, 54, 64, 120], labels=edades)
+        col_v, orden = {
+            "Edad": ("grupo_edad", edades), "Sexo": ("sexo", ["Hombre", "Mujer"]),
+            "Exposición a la IA": ("nivel", EXPO_ORDER), "Educación": ("educ", EDU_ORDER),
+            "Grupo ocupacional": ("grupo", None),
+        }[ver]
+        dv = dur_stats(ddur, [col_v])
+        dv = dv[dv["n"] >= MIN_CELL]
+        total_lp = 100 * ddur.loc[ddur["semanas"] >= LONG_TERM_WEEKS, "peso"].sum() / ddur["peso"].sum()
+        if ver == "Grupo ocupacional":
+            fig = px.bar(dv.sort_values("largo_plazo"), x="largo_plazo", y=col_v, orientation="h",
+                         color_discrete_sequence=[C_RED], hover_data={"n": True},
+                         labels={"largo_plazo": f"% con ≥ {LONG_TERM_WEEKS} semanas buscando", col_v: ""})
+            fig.add_vline(x=total_lp, line_dash="dash", line_color="#777")
+            fig.update_xaxes(ticksuffix="%")
+        else:
+            fig = px.bar(dv, x=col_v, y="largo_plazo", color=col_v if ver == "Exposición a la IA" else None,
+                         color_discrete_map=EXPO_COLORS, color_discrete_sequence=[C_RED],
+                         category_orders={col_v: orden}, hover_data={"n": True},
+                         labels={"largo_plazo": f"% con ≥ {LONG_TERM_WEEKS} semanas buscando", col_v: ver})
+            fig.add_hline(y=total_lp, line_dash="dash", line_color="#777")
+            fig.update_yaxes(ticksuffix="%").update_layout(showlegend=False)
+        show(style(fig, 420), "edu_quien_fig")
+        tip(f"Porcentaje de desempleados que lleva {LONG_TERM_WEEKS} semanas o más buscando trabajo (desempleo de larga duración). "
+            f"La línea punteada es el promedio general: {total_lp:.1f}%.")
 
 # ════════════════════════════════════════════════════════════════════════════
 # 8. TAB 4 · OCUPACIONES
@@ -683,7 +728,7 @@ with tabs[3]:
         tip(f"Cada burbuja es una ocupación (tamaño = empleo). Correlación de Spearman exposición–salario: {fnum(rho_s, 2)}.")
     with c2:
         st.subheader("Ocupaciones con mayor desempleo")
-        to = tasa(fy, ["ocupacion", "nivel"])
+        to = tasa(fy22, ["ocupacion", "nivel"])
         to = to[to["n_des"] >= 100].nlargest(15, "tasa").sort_values("tasa")
         fig = px.bar(to, x="tasa", y="ocupacion", color="nivel", orientation="h",
                      color_discrete_map=EXPO_COLORS, category_orders={"nivel": EXPO_ORDER},
@@ -749,22 +794,36 @@ with tabs[4]:
             pct_mujeres=("pct_mujeres", "median"), edad_media=("edad_media", "median"),
             pct_universitarios=("pct_universitarios", "median"),
         ).reindex(TRAY_ORDER)
+        # Edad, % mujeres y % pregrado+: promedio ponderado de los TRABAJADORES de cada grupo (igual que el notebook)
+        tmap = cs.set_index("ocupacion")["trayectoria"]
+        wk = f[f["ocupacion"].isin(tmap.index)]
+        wk = wk.assign(tray=wk["ocupacion"].map(tmap), mujer=(wk["sexo"] == "Mujer").astype(float),
+                       univ=wk["educ"].isin(UNIV).astype(float)).dropna(subset=["tray"])
+        prof = {}
+        for nombre, g in wk.groupby("tray", observed=True):
+            w = g["peso"].to_numpy(float)
+            prof[nombre] = {"pct_mujeres": 100 * np.average(g["mujer"], weights=w),
+                            "edad_media": np.average(g["edad"], weights=w),
+                            "pct_universitarios": 100 * np.average(g["univ"], weights=w)}
+        prof = pd.DataFrame(prof).T.reindex(TRAY_ORDER)
+        for c_ in ["pct_mujeres", "edad_media", "pct_universitarios"]:
+            grp[c_] = prof[c_]
         opciones = {
-            "Salario mediano anual (USD)": "salario", "% de mujeres": "pct_mujeres", "Edad media": "edad_media",
-            "% con pregrado o más": "pct_universitarios", "Empleo total de la ocupación": "empleo",
-            "Exposición a la IA (0 a 1)": "expo",
+            "Exposición a la IA (0 a 1)": "expo", "Empleo total de la ocupación": "empleo",
+            "Salario mediano anual (USD)": "salario", "Tasa de desempleo inicial (%)": "tasa_antes",
+            "% de mujeres": "pct_mujeres", "Edad media": "edad_media", "% con pregrado o más": "pct_universitarios",
         }
         cc1, cc2 = st.columns([2, 3])
         with cc1:
             carac = st.selectbox("Característica", list(opciones), key="tr_car")
-            gp = grp[[opciones[carac]]].reset_index().dropna()
-            fig = px.bar(gp, x="trayectoria", y=opciones[carac], color="trayectoria", color_discrete_map=TRAY_COLORS,
-                         category_orders={"trayectoria": TRAY_ORDER},
-                         text=gp[opciones[carac]].map(lambda v: f"{v:,.2f}" if abs(v) < 5 else f"{v:,.0f}"),
+            fig = px.box(cs, x="trayectoria", y=opciones[carac], color="trayectoria", points="all",
+                         hover_name="ocupacion", color_discrete_map=TRAY_COLORS,
+                         category_orders={"trayectoria": TRAY_ORDER}, log_y=(opciones[carac] == "empleo"),
                          labels={opciones[carac]: carac, "trayectoria": ""})
-            fig.update_traces(textposition="outside").update_layout(showlegend=False)
-            show(style(fig, 340), "tr_car_fig")
-            tip("Mediana de la característica entre las ocupaciones de cada grupo.")
+            fig.update_layout(showlegend=False)
+            show(style(fig, 380), "tr_car_fig")
+            tip("Cada punto es una ocupación; la caja marca el 50 % central y la línea interior, la mediana. "
+                "El empleo total se muestra en escala logarítmica.")
         with cc2:
             tabla = grp.reset_index().rename(columns={
                 "trayectoria": "Grupo", "ocupaciones": "# ocupaciones", "cambio_pp": "Cambio mediano (pp)",
@@ -782,9 +841,21 @@ with tabs[4]:
                 "Edad media": st.column_config.NumberColumn(format="%.1f"),
                 "% pregrado+": st.column_config.NumberColumn(format="%.1f"),
             })
-            st.markdown('<span class="small">Medianas entre ocupaciones. Empleo y salario provienen de BLS OEWS; '
-                        "sexo, edad y educación, de CPS ponderado por WTFINL.</span>", unsafe_allow_html=True)
-
+            st.markdown('<span class="small">Salario, empleo y exposición: mediana entre las ocupaciones del grupo (BLS OEWS). '
+                        "Edad, % mujeres y % pregrado+: promedio ponderado de los trabajadores de esas ocupaciones (CPS, WTFINL).</span>",
+                        unsafe_allow_html=True)
+        st.subheader("Composición por grupo ocupacional")
+        presentes = [t for t in TRAY_ORDER if t in set(cs["trayectoria"])]
+        comp_g = (pd.crosstab(cs["grupo"], cs["trayectoria"], normalize="columns").mul(100)
+                  .reindex(columns=presentes).reset_index()
+                  .melt(id_vars="grupo", var_name="trayectoria", value_name="pct"))
+        fig = px.bar(comp_g, x="pct", y="grupo", color="trayectoria", barmode="group", orientation="h",
+                     color_discrete_map=TRAY_COLORS, category_orders={"trayectoria": TRAY_ORDER},
+                     labels={"pct": "% de las ocupaciones del grupo", "grupo": "", "trayectoria": ""})
+        fig.update_xaxes(ticksuffix="%")
+        show(style(fig, 380), "tr_comp")
+        tip("Dentro de cada grupo (subió / estable / bajó), qué porcentaje de sus ocupaciones pertenece a cada gran grupo ocupacional.")
+        
         cols_show = {"ocupacion": "Ocupación", "nivel": "Exposición", "expo": "Índice IA", "tasa_antes": "Tasa inicial %",
                      "tasa_despues": "Tasa reciente %", "cambio_pp": "Cambio (pp)", "empleo": "Empleo total",
                      "salario": "Salario mediano"}
@@ -807,11 +878,80 @@ with tabs[4]:
             st.dataframe(est[list(cols_show)].rename(columns=cols_show), hide_index=True, column_config=cfg)
         st.download_button("Descargar tabla completa (CSV)", cambio.to_csv(index=False).encode("utf-8"),
                            "trayectorias_ocupaciones.csv", "text/csv")
+        
+# ════════════════════════════════════════════════════════════════════════════
+# 10. TAB 5 · CONLUSIONES
+# ════════════════════════════════════════════════════════════════════════════
 
-# ════════════════════════════════════════════════════════════════════════════
-# 10. TAB 6 · MÉTODO Y DATOS
-# ════════════════════════════════════════════════════════════════════════════
 with tabs[5]:
+    lp = dur_stats(fy22, ["nivel"]).set_index("nivel")["largo_plazo"].to_frame("v")
+    lp_edu = dur_stats(fy22, ["educ"]).set_index("educ")["largo_plazo"]
+    de = dur_stats(fy22, ["educ", "nivel"])
+    de = de[de["n"] >= MIN_CELL]
+    pv = de.pivot(index="educ", columns="nivel", values="largo_plazo") if not de.empty else pd.DataFrame()
+    gap = (pv["Alta"] - pv["Baja"]).dropna() if {"Alta", "Baja"} <= set(pv.columns) else pd.Series(dtype=float)
+    ps = (cambio.groupby("nivel")["trayectoria"].apply(lambda s: 100 * (s == "Subió").mean()).to_frame("v")
+          if not cambio.empty else pd.DataFrame({"v": []}))
+    if not cambio.empty:
+        sube_, alta_ = cambio["trayectoria"] == "Subió", cambio["nivel"] == "Alta"
+        p_val = chi2_p(int((alta_ & sube_).sum()), int((alta_ & ~sube_).sum()),
+                       int((~alta_ & sube_).sum()), int((~alta_ & ~sube_).sum()))
+    else:
+        p_val = np.nan
+    txt_p = ("" if pd.isna(p_val) else
+             f" La diferencia frente al resto {'no ' if p_val >= 0.05 else ''}es estadísticamente significativa (p = {fnum(p_val, 2)}).")
+
+    st.subheader("Respuesta a la pregunta analítica")
+    a, b = st.columns(2)
+    a.markdown(insight(
+        "Parte A · Educación, tiempo buscando empleo y exposición",
+        f"El <b>{fnum(getv(lp, 'Alta', 'v'), 1, suf='%')}</b> de los desempleados de ocupaciones de exposición alta lleva "
+        f"{LONG_TERM_WEEKS} semanas o más buscando trabajo, frente a {fnum(getv(lp, 'Baja', 'v'), 1, suf='%')} en exposición baja. "
+        f"La brecha es mayor en <b>{gap.idxmax() if len(gap) else 'n/d'}</b> "
+        f"({fnum(gap.max() if len(gap) else np.nan, 1, True, ' pp')}). "
+        f"La duración <b>aumenta con la educación</b> ({fnum(lp_edu.get('Sin bachillerato', np.nan), 1, suf='%')} sin bachillerato "
+        f"vs {fnum(lp_edu.get('Posgrado', np.nan), 1, suf='%')} con posgrado): lo contrario a lo que suponía nuestra hipótesis.",
+    ), unsafe_allow_html=True)
+    b.markdown(insight(
+        "Parte B · Ocupaciones que subieron vs. estables",
+        f"El desempleo subió ≥ {umbral:g} pp en el <b>{fnum(getv(ps, 'Alta', 'v'), 0, suf='%')}</b> de las ocupaciones de exposición alta, "
+        f"frente a {fnum(getv(ps, 'Media', 'v'), 0, suf='%')} (media) y {fnum(getv(ps, 'Baja', 'v'), 0, suf='%')} (baja). "
+        f"La correlación exposición–cambio es débil (<b>{fnum(rho, 2)}</b>).{txt_p} Dentro de las muy expuestas, las que subieron tienen "
+        "más trabajadores con pregrado o más, menos mujeres, menos empleo total y mayor peso del grupo "
+        "<i>Management, Business, Science, and Arts</i> (ver pestaña anterior).",
+    ), unsafe_allow_html=True)
+
+    st.subheader("Qué significa")
+    st.markdown(
+        "- **Hay una señal, pero es débil y no concluyente.** Con las seis medidas de exposición la correlación va de 0,06 a 0,12, y la diferencia en la proporción de ocupaciones que subieron no es estadísticamente significativa.\n"
+        "- **No es causalidad.** La exposición mide qué tareas *podría* hacer la IA, no si las empresas la usan; en los mismos años "
+        "subieron las tasas de interés y hubo recortes en tecnología.\n"
+        "- **Mayor educación no protege del desempleo prolongado** en las ocupaciones más expuestas: el riesgo se concentra en "
+        "perfiles técnicos, profesionales y de posgrado.\n"
+        "- **Ojo con lo que no es IA:** las ocupaciones con más desempleo son estacionales y de exposición baja."
+    )
+
+    st.subheader("Recomendaciones")
+    st.markdown(
+        """
+| # | Acción | Para quién | Qué la respalda | Cómo medir si funciona |
+|---|---|---|---|---|
+| 1 | Programa de **recapacitación y reubicación** en habilidades complementarias a la IA | Desempleados con formación técnica, pregrado o posgrado de ocupaciones de exposición alta | Mayor desempleo de larga duración que en exposición baja en esos niveles | % de desempleados de larga duración en exposición alta |
+| 2 | **Campaña de reempleo** para personas mayores | 55–64 años (27,5 % lleva ≥ 27 semanas buscando, vs 14,7 % entre 16 y 24) | Duración de desempleo por edad | Semanas medianas de búsqueda en 55–64 |
+| 3 | **Monitoreo periódico** de ocupaciones de exposición alta, poco empleo total y perfil gerencial/profesional | Entidades de empleo y formación | Son las que más suben | Lista de alerta trimestral por ocupación |
+| 4 | **No limitar la política a la exposición alta** | Diseñadores de política | Exposición baja tiene la mayor tasa de desempleo (5,65 % vs 2,95 %) | Tasa de desempleo por nivel de exposición |
+| 5 | **Incorporar formación en uso de IA como herramienta** en programas técnicos, universitarios y de posgrado | Instituciones de educación y formación | La brecha de desempleo de larga duración entre exposición alta y baja es mayor en técnico o asociado (27,6 % vs 20,6 %) y en posgrado (28,7 % vs 21,3 %) | % de desempleados de larga duración con formación técnica o de posgrado en exposición alta |
+"""
+    )
+    st.caption("Los textos interpretativos y las cifras de las recomendaciones 2 y 4 corresponden a los parámetros por defecto "
+               "(filtros sin tocar); las cifras de las tarjetas sí se actualizan con los filtros. "
+               "Todos los resultados son asociaciones, no efectos causales.")
+    
+    
+# ════════════════════════════════════════════════════════════════════════════
+# 11. TAB 6 · MÉTODO Y DATOS
+# ════════════════════════════════════════════════════════════════════════════
+with tabs[6]:
     st.subheader("Cómo se construyó")
     st.markdown(
         f"""
