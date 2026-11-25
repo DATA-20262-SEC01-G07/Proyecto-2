@@ -111,8 +111,14 @@ Proyecto-2/
 4. Abrir `notebooks/cargads.ipynb` y correr las celdas de arriba hacia abajo.
 
 ## Resultados
+Entre 2022 y 2026 la tasa de desempleo pasó de 2,24 % a 2,95 % en las ocupaciones de exposición alta, de 5,09 % a 5,65 % en las de exposición baja y de 3,38 % a 3,52 % en las de exposición media. Respecto a 2022, el desempleo de la exposición alta creció 31,6 %, el de la baja 11,1 % y el de la media 4,1 %, pero la exposición alta parte del nivel más bajo (+0,71 puntos, frente a +0,56 en la baja). De las 15 ocupaciones con mayor tasa de desempleo, solo una es de exposición alta.
 
-Pendiente (Lo voy a rellenar cunando Tomás y Juliana terminen)
+Comparando 2022–2023 con 2025–2026, el desempleo subió más de un punto en el 42 % de las ocupaciones de exposición alta, frente al 32 % en las de exposición baja y el 33 % en las de exposición media. La correlación entre exposición y cambio en la tasa es de 0,12. Dentro de las de exposición alta, las que subieron (42) tienen mayor exposición mediana (0,55 frente a 0,50), menos empleo total (188.695 frente a 295.650), salarios similares y la misma tasa previa. Son más del grupo Management, Business, Science, and Arts (69,0 % frente a 58,8 %) y sus trabajadores tienen más pregrado o más (72,0 % frente a 56,7 %) y menos mujeres (41,8 % frente a 52,9 %).
+
+El 22,3 % de los desempleados lleva 27 semanas o más buscando trabajo. Este porcentaje sube con la edad (14,7 % entre los 16 y 24 años, 27,5 % entre los 55 y 64) y es mayor en la exposición alta (25,8 %) que en la baja y media (21,0 % y 21,4 %). Aumenta con el nivel educativo, de 18,5 % con menos de secundaria a 25,4 % con posgrado. El valor más alto es el de posgrado con exposición alta (28,7 %).
+
+Hay un apoyo débil a que el desempleo haya crecido más donde la exposición es mayor. Que la relación sea más fuerte con menor educación no se evaluó con el cambio en el desempleo, y en la duración ocurre lo contrario. Los resultados son asociaciones y no permiten atribuir el desempleo a la IA.
+
 ## Limitaciones
 
 - **Estar expuesto no es lo mismo que ser reemplazado.** El índice mide lo que la IA podría hacer en cada ocupación, no si las empresas la están usando.
@@ -125,11 +131,7 @@ Pendiente (Lo voy a rellenar cunando Tomás y Juliana terminen)
 
 ## Siguientes pasos
 
-Con los resultados obtenidos, los siguientes pasos del proyecto deben apuntar a qué hacer en Colombia con lo que se encontró en Estados Unidos. Como el desempleo creció algo más en las ocupaciones muy expuestas a la IA, y estas son sobre todo profesionales y administrativas, el primer paso es identificar cuáles ocupaciones colombianas se parecen a ellas y qué porcentaje de la fuerza laboral del país las ocupa, usando la GEIH del DANE y una equivalencia entre la clasificación ocupacional colombiana y los códigos SOC. Como la relación entre exposición y desempleo resultó débil y no se puede atribuir a la IA, el segundo paso es no sacar conclusiones fuertes, sino monitorear estas ocupaciones en Colombia a medida que haya más datos sobre el uso real de la IA en las empresas. Como la larga duración del desempleo fue mayor en las personas con más estudios y en las ocupaciones más expuestas, el tercer paso es que el Ministerio de Educación, el SENA y las universidades enseñen el uso de la IA como herramienta, empezando por los programas que forman para esos oficios y sin dirigirla solo a quienes tienen menos escolaridad. Por último, como en Colombia hay mucha informalidad y los datos de Estados Unidos no se pueden trasladar tal cual, conviene repetir el estudio con datos colombianos para comprobar si el patrón se mantiene antes de diseñar políticas concretas.
-
-## Uso de inteligencia artificial
-
-Con autorización del profesor, usamos herramientas de IA como apoyo para [describir: por ejemplo, revisar la redacción del README y revisar el código]. Las decisiones del análisis y la revisión final las hicimos nosotros.
+Una vez completado este análisis para Estados Unidos, el equipo quiere hacer un estudio similar para Colombia con la GEIH del DANE, adaptando el índice de exposición mediante una equivalencia entre la CIUO-08 A.C. y las ocupaciones SOC. 
 
 ## Equipo
 
