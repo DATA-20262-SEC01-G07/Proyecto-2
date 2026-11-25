@@ -587,17 +587,29 @@ with tabs[1]:
 # 7. TAB 3 · EDUCACIÓN Y REEMPLEO (primera mitad de la pregunta analítica)
 # ════════════════════════════════════════════════════════════════════════════
 with tabs[2]:
+    vista = st.radio("Mapa de calor", ["Tasa de desempleo (%)", f"% desempleo de larga duración (≥ {LONG_TERM_WEEKS} sem.)"],
+                     horizontal=True, key="edu_heat_sel")
     c1, c2 = st.columns(2)
     with c1:
-        st.subheader("Desempleo según educación y exposición")
-        h = tasa(fy, ["educ", "nivel"]).pivot(index="educ", columns="nivel", values="tasa")
+        if vista.startswith("Tasa"):
+            st.subheader("Desempleo según educación y exposición")
+            h = tasa(fy, ["educ", "nivel"]).pivot(index="educ", columns="nivel", values="tasa")
+            etiqueta = "Desempleo %"
+            explicacion = "Cada casilla es la tasa de desempleo (%) de un cruce educación × exposición. Más oscuro = más desempleo."
+        else:
+            st.subheader("Larga duración según educación y exposición")
+            dh = dur_stats(fy22, ["educ", "nivel"])
+            h = dh[dh["n"] >= MIN_CELL].pivot(index="educ", columns="nivel", values="largo_plazo")
+            etiqueta = "% larga duración"
+            explicacion = (f"Cada casilla es el % de desempleados que lleva {LONG_TERM_WEEKS} semanas o más buscando trabajo, "
+                           f"para un cruce educación × exposición (desde 2022). Más oscuro = búsquedas más largas.")
         h = h.reindex(index=EDU_ORDER, columns=EXPO_ORDER)
         fig = px.imshow(h, text_auto=".1f", aspect="auto",
                         color_continuous_scale=["#FFF1EC", C_ORANGE, C_WINE, C_DARK],
-                        labels=dict(x="Exposición a la IA", y="", color="Desempleo %"))
+                        labels=dict(x="Exposición a la IA", y="", color=etiqueta))
         fig.update_layout(coloraxis_showscale=False)
         show(style(fig, 400), "edu_heat")
-        tip("Cada casilla es la tasa de desempleo (%) de un cruce educación × exposición. Más oscuro = más desempleo.")
+        tip(explicacion)
     with c2:
         st.subheader("¿Quién trabaja en cada nivel de exposición?")
         comp = fy.groupby(["nivel", "educ"])["peso"].sum().reset_index()
