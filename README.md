@@ -125,7 +125,7 @@ Pendiente (Lo voy a rellenar cunando Tomás y Juliana terminen)
 
 ## Siguientes pasos
 
-Pendiente: se completa con los resultados.
+Con los resultados obtenidos, los siguientes pasos del proyecto deben apuntar a qué hacer en Colombia con lo que se encontró en Estados Unidos. Como el desempleo creció algo más en las ocupaciones muy expuestas a la IA, y estas son sobre todo profesionales y administrativas, el primer paso es identificar cuáles ocupaciones colombianas se parecen a ellas y qué porcentaje de la fuerza laboral del país las ocupa, usando la GEIH del DANE y una equivalencia entre la clasificación ocupacional colombiana y los códigos SOC. Como la relación entre exposición y desempleo resultó débil y no se puede atribuir a la IA, el segundo paso es no sacar conclusiones fuertes, sino monitorear estas ocupaciones en Colombia a medida que haya más datos sobre el uso real de la IA en las empresas. Como la larga duración del desempleo fue mayor en las personas con más estudios y en las ocupaciones más expuestas, el tercer paso es que el Ministerio de Educación, el SENA y las universidades enseñen el uso de la IA como herramienta, empezando por los programas que forman para esos oficios y sin dirigirla solo a quienes tienen menos escolaridad. Por último, como en Colombia hay mucha informalidad y los datos de Estados Unidos no se pueden trasladar tal cual, conviene repetir el estudio con datos colombianos para comprobar si el patrón se mantiene antes de diseñar políticas concretas.
 
 ## Uso de inteligencia artificial
 
