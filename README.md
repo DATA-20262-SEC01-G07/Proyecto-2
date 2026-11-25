@@ -61,10 +61,9 @@ Con esa información, entidades como el Ministerio de Educación o el SENA podr�
 
 El archivo del CPS (`cps_00001.csv`) no está en el repositorio porque pesa demasiado. Para obtenerlo:
 
-1. Crear una cuenta gratuita en [IPUMS-CPS](https://cps.ipums.org/cps/).
-2. Seleccionar las muestras mensuales (Basic Monthly) de enero de 2021 a octubre de 2026.
-3. Seleccionar las variables: `YEAR`, `MONTH`, `SERIAL`, `PERNUM`, `CPSID`, `CPSIDP`, `WTFINL`, `AGE`, `SEX`, `EMPSTAT`, `DURUNEMP`, `EDUC`, `OCC` y `OCC2010`.
-4. Descargar el extracto en formato CSV y guardarlo como `data/raw/cps_00001.csv`.
+1. Abrir este link https://drive.google.com/drive/folders/1RJNNGGCqOdKzEQ4liJFgQYuejrqTWWYS?usp=drive_link
+
+2. Descomprimir el archivo y guardarlo en `data/raw`
 
 ## Preparación de los datos
 
@@ -85,7 +84,7 @@ Proyecto-2/
 ├── requirements.txt
 ├── data/
 │   └── raw/
-│       ├── cps_00001.csv            (no está en el repo, ver "Cómo conseguir el archivo del CPS")
+│       ├── cps_00001.csv            (No está en el repositorio, ver "Cómo conseguir el archivo del CPS")
 │       ├── census_crosswalk.csv
 │       ├── bls_oews_national.csv
 │       └── occ_level.csv
@@ -108,6 +107,7 @@ Proyecto-2/
    ```
 
 3. Descargar el archivo del CPS y guardarlo en `data/raw/`.
+
 4. Abrir `notebooks/cargads.ipynb` y correr las celdas de arriba hacia abajo.
 
 ## Resultados
