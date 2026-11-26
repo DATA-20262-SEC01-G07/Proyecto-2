@@ -19,6 +19,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+
+DATOS = Path(__file__).parent / "data" / "dashboard"
+desempleo_nivel = pd.read_csv(DATOS / "desempleo_nivel.csv")
+
 # ════════════════════════════════════════════════════════════════════════════
 # 0. CONFIGURACIÓN Y PALETA
 # ════════════════════════════════════════════════════════════════════════════
