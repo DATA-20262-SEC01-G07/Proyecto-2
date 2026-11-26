@@ -20,9 +20,6 @@ import plotly.graph_objects as go
 import streamlit as st
 
 
-DATOS = Path(__file__).parent / "data" / "dashboard"
-desempleo_nivel = pd.read_csv(DATOS / "desempleo_nivel.csv")
-
 # ════════════════════════════════════════════════════════════════════════════
 # 0. CONFIGURACIÓN Y PALETA
 # ════════════════════════════════════════════════════════════════════════════
@@ -79,7 +76,10 @@ NEEDED = [
     "YEAR", "MONTH", "WTFINL", "AGE", "SEX", "EMPSTAT", "OCC", "DURUNEMP", "EDUC",
     "Major_Group", "Census_Title", "SOC_Code", "TOT_EMP", "A_MEDIAN", *METRICS.keys(),
 ]
+ROOT = Path(__file__).resolve().parent.parent 
 DEFAULT_PATHS = [
+    str(ROOT / "data" / "dashboard" / "df_dashboard.parquet"),
+    "data/processed/df_completo.pkl", "../data/processed/df_completo.pkl", "df_completo.pkl",
     "data/processed/df_completo.pkl", "../data/processed/df_completo.pkl", "df_completo.pkl",
     "data/processed/df_completo.csv", "../data/processed/df_completo.csv",
     "df_completo.csv", "dataset_final.csv",
@@ -123,7 +123,7 @@ h1,h2,h3,h4 {{color:var(--ink); letter-spacing:-0.01em;}}
 # ════════════════════════════════════════════════════════════════════════════
 # 1. CARGA Y PREPARACIÓN DE DATOS (misma lógica del notebook)
 # ════════════════════════════════════════════════════════════════════════════
-@st.cache_data(show_spinner="Leyendo el dataset…")
+@st.cache_resource(show_spinner="Leyendo el dataset…")
 def load_raw(path: str | None, file_bytes: bytes | None, name: str = "") -> pd.DataFrame:
     """Lee CSV, pickle (.pkl) o parquet (.parquet)."""
     ext = Path(name or path or "").suffix.lower()
@@ -146,12 +146,10 @@ def load_raw(path: str | None, file_bytes: bytes | None, name: str = "") -> pd.D
 def edu_group(e: pd.Series) -> pd.Series:
     """Agrupa EDUC (códigos IPUMS-CPS) en 6 niveles legibles."""
     e = pd.to_numeric(e, errors="coerce")
-    conds = [e <= 72, e <= 80, e <= 90, e <= 100, e <= 111, e < 999]
-    out = pd.Series(np.select(conds, EDU_ORDER, default=""), index=e.index)
-    return out.replace("", np.nan)
+    return pd.cut(e, bins=[-np.inf, 72, 80, 90, 100, 111, 998], labels=EDU_ORDER).astype(object)
 
 
-@st.cache_data(show_spinner="Preparando variables…")
+@st.cache_resource(show_spinner="Preparando variables…")
 def prepare(_raw: pd.DataFrame, source_id: str, metric: str) -> pd.DataFrame:
     d = _raw[(_raw["OCC"].fillna(0) != 0) & _raw["EMPSTAT"].between(10, 22)].copy()
     d = d.dropna(subset=["SOC_Code", "Census_Title", metric])
@@ -1001,5 +999,4 @@ with tabs[6]:
                        "Census_Title", "Major_Group", "TOT_EMP (BLS)", "A_MEDIAN (BLS)", f"{metric} (Eloundou)",
                        "Tercil de la exposición"],
         }), hide_index=True)
-    st.download_button("Descargar muestra filtrada (CSV)", fy.to_csv(index=False).encode("utf-8"),
-                       "muestra_filtrada.csv", "text/csv")
+    
